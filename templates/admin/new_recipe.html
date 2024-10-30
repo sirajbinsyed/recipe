@@ -1,0 +1,102 @@
+{% extends "./admin/base.html" %}
+{% block content %}
+
+  <style>
+    .view-more {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+  </style>
+
+    <div class="content-body">
+        <div class="container-fluid">
+            
+
+            <!-- Table Section -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div style="padding:50px;" class="card-title">
+                            <h4>recipe Table</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table style="color: black;" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Details</th>
+                                            <th>ingredients</th>
+                                            <th>User</th>
+                                            <th>Category</th>
+                                            <th>image</th>
+                                            <th>video</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for recipe in recipes %}
+                                        <tr>
+                                            <td>{{recipe.recipe_id}}</td>
+                                            <td>{{recipe.recipe_title}}</td>
+                                            <td style="max-width: 200px; word-wrap: break-word; white-space: normal;">
+                                                <small>
+                                                    <span class="short-text">
+                                                        {{ recipe.recipe_description[:100] | replace('\n', '<br>') | safe }} <!-- Show first 100 characters -->
+                                                    </span>
+                                                    <span class="full-text" style="display: none;">
+                                                        {{ recipe.recipe_description | replace('\n', '<br>') | safe }} <!-- Full text here -->
+                                                    </span>
+                                                    {% if recipe.recipe_description|length > 100 %}
+                                                        <a href="javascript:void(0);" class="view-more" onclick="toggleText(this)">View More</a>
+                                                    {% endif %}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                {{ recipe.ingredients | replace('\n', '<br>') | safe }}
+                                            </td>
+                                            <td>{{recipe.login_username}}</td>
+                                            <td>{{recipe.category_name}}</td>
+                                            <td><img src="static/recipe/{{recipe.recipe_image}}" style="width:150px"></td>
+                                            <td>
+                                              <iframe width="150" height="84" 
+                                                  src="https://www.youtube.com/embed/{{ recipe.recipe_video.split('v=')[1] }}" 
+                                                  frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                  allowfullscreen></iframe>
+                                          </td>
+                                          <td> <a href="{{ url_for('approverecipe', recipe_id=recipe.recipe_id) }}" class="btn btn-success btn-sm">Approve</a>
+                                               <a style="margin: 5px;" href="{{ url_for('rejectrecipe', recipe_id=recipe.recipe_id) }}" class="btn btn-danger btn-sm"> Reject </a>
+                                          </td>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleText(element) {
+            const shortText = element.previousElementSibling.previousElementSibling;
+            const fullText = element.previousElementSibling;
+        
+            if (fullText.style.display === "none") {
+                fullText.style.display = "inline";
+                shortText.style.display = "none";
+                element.innerText = "View Less";
+            } else {
+                fullText.style.display = "none";
+                shortText.style.display = "inline";
+                element.innerText = "View More";
+            }
+        }
+        </script>
+
+
+{% endblock %}

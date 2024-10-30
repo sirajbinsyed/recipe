@@ -1,0 +1,80 @@
+{%extends "./guest/base.html" %}
+{% block content %}
+
+  <!-- book section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2 style="color: #fff;">
+          Register
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <div class="form_container">
+            <form action="/register" method="post">
+
+              <div>
+                <input type="text" class="form-control" placeholder="Full name" name="name"  pattern="^[a-zA-Z\s]+$"
+                title="Name should only contain letters and spaces." required/>
+              </div>
+              <div>
+                <input type="email" class="form-control" placeholder="Email" name="details">
+              </div>
+
+              <div class="row">
+                <div class="col-md-6"><input type="text" class="form-control" placeholder="Username" name="username" /></div>
+                
+                <div class="col-md-6">
+                  <input type="password" id="id_password" class="form-control" placeholder="Password (example: P@ssw0rd123)" name="password" 
+                         pattern="^(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
+                         title="Password must be at least 8 characters long and include both uppercase and lowercase letters." required />
+                         <img src="https://media.geeksforgeeks.org/wp-content/uploads/20210917145551/eye.png"
+                         width="20" height="20"
+                         style="position: absolute; top: 50%; right: 20px; transform: translateY(-105%); cursor: pointer;"
+                         id="togglePassword">
+              </div>
+
+              </div>
+             
+             
+              <div class="btn_box">
+                <button type="submit">
+                  Login
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+  <!-- end book section -->
+  <script>
+    const togglePassword =
+          document.querySelector('#togglePassword');
+
+    const password = 
+          document.querySelector('#id_password');
+
+    togglePassword.
+    addEventListener('click', function (e) {
+
+        // Toggle the type attribute 
+        const type = password.getAttribute(
+            'type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+
+        // Toggle the eye slash icon 
+        if (togglePassword.src.match(
+"https://media.geeksforgeeks.org/wp-content/uploads/20210917150049/eyeslash.png")) {
+            togglePassword.src =
+"https://media.geeksforgeeks.org/wp-content/uploads/20210917145551/eye.png";
+        } else {
+            togglePassword.src =
+"https://media.geeksforgeeks.org/wp-content/uploads/20210917150049/eyeslash.png";
+        }
+    }); 
+</script>
+{% endblock %}

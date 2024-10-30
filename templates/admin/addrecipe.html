@@ -1,0 +1,188 @@
+{% extends "./admin/base.html" %}
+{% block content %}
+<style>
+    .view-more {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+  </style>
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-title">
+                            <h4>Recipe Form</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="horizontal-form">
+                                <form class="form-horizontal" method="POST" action="{{ url_for('adminaddrecipe') }}" enctype="multipart/form-data">
+                                    <input type="hidden" name="recipe_id" value="{{ category_to_edit.recipe_id if category_to_edit else '' }}">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Category</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="category">
+                                                <option value="" disabled selected>--Select a Category--</option>
+                                                {% for category in categories %}
+                                                    <option value="{{ category.category_id }}" 
+                                                        {% if category_to_edit and category.category_id == category_to_edit.recipe_category_id %}selected{% endif %}>
+                                                        {{ category.category_name }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Title</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" placeholder="Title" name="title" value="{{ category_to_edit.recipe_title if category_to_edit else '' }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Details</label>
+                                        <div class="col-sm-10">
+                                            <textarea class="form-control" placeholder="Details" name="details">{{ category_to_edit.recipe_description if category_to_edit else '' }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Ingredients</label>
+                                        <div class="col-sm-10">
+                                            <textarea style="width: 100%; height: 130px;" class="form-control" placeholder="Ingredients" name="ingredients">{{ category_to_edit.ingredients if category_to_edit else '' }}</textarea>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Image</label>
+                                        <div class="col-sm-10">
+                                            <input type="file" class="form-control" name="image" />
+                                            {% if category_to_edit and category_to_edit.recipe_image %}
+                                                <img src="{{ url_for('static', filename='recipe/' ~ category_to_edit.recipe_image) }}" style="width:150px;">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Video</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" placeholder="YouTube Video Link" name="link" value="{{ category_to_edit.recipe_video if category_to_edit else '' }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-default">SUBMIT</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-title">
+                            <h4>Recipe Table</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Category</th>
+                                            <th>Title</th>
+                                            <th>Details</th>
+                                            <th>Ingredients</th>
+                                            <th>Image</th>
+                                            <th>Video</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for recipe in recipes %}
+                                       
+                                        <tr>
+                                            <th scope="row">{{ recipe.recipe_id }}</th>
+                                            <td>{{ recipe.category_name }}</td>
+                                            <td>{{ recipe.recipe_title }}</td>
+                                            <!-- Recipe Description with View More -->
+                                            <td style="max-width: 200px; word-wrap: break-word; white-space: normal;">
+                                                <small>
+                                                    <span class="short-text">
+                                                        {{ recipe.recipe_description[:50] | replace('\n', '<br>') | safe }} <!-- Show first 100 characters -->
+                                                    </span>
+                                                    <span class="full-text" style="display: none;">
+                                                        {{ recipe.recipe_description | replace('\n', '<br>') | safe }} <!-- Full text here -->
+                                                    </span>
+                                                    {% if recipe.recipe_description|length > 50 %}
+                                                        <a href="javascript:void(0);" class="view-more" onclick="toggleText(this)"> view more...</a>
+                                                    {% endif %}
+                                                </small>
+                                            </td>
+
+                                            <!-- Ingredients with View More -->
+                                            <td style="max-width: 200px; word-wrap: break-word; white-space: normal;">
+                                                <small>
+                                                    <span class="short-text">
+                                                        {{ recipe.ingredients[:50] | replace('\n', '<br>') | safe }} <!-- Show first 100 characters -->
+                                                    </span>
+                                                    <span class="full-text" style="display: none;">
+                                                        {{ recipe.ingredients | replace('\n', '<br>') | safe }} <!-- Full text here -->
+                                                    </span>
+                                                    {% if recipe.ingredients|length > 50 %}
+                                                        <a href="javascript:void(0);" class="view-more" onclick="toggleText(this)"> view more...</a>
+                                                    {% endif %}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <img src="{{ url_for('static', filename='recipe/' ~ recipe.recipe_image) }}" style="width:150px;">
+                                            </td>
+                                            <td>
+                                                <iframe width="150" height="84"
+                                                        src="https://www.youtube.com/embed/{{ recipe.recipe_video.split('v=')[1] }}"
+                                                        frameborder="0" allowfullscreen></iframe>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('adminaddrecipe', edit=recipe.recipe_id) }}" class="btn btn-info">Edit</a>
+                                                <form action="{{ url_for('delete_recipe', recipe_id=recipe.recipe_id) }}" method="post" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ <script>
+        function toggleText(element) {
+            const shortText = element.previousElementSibling.previousElementSibling;
+            const fullText = element.previousElementSibling;
+        
+            if (fullText.style.display === "none") {
+                fullText.style.display = "inline";  // Show full text
+                shortText.style.display = "none";   // Hide short text
+                element.textContent = "view less";  // Change link text
+            } else {
+                fullText.style.display = "none";    // Hide full text
+                shortText.style.display = "inline"; // Show short text
+                element.textContent = "view more...";  // Change link text
+            }
+        }
+ </script>
+{% endblock %}

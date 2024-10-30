@@ -1,0 +1,113 @@
+{% extends "./guest/base.html" %}
+{% block content %}
+<style>
+    .rating {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+}
+.rating > label {
+    color: #ddd;
+    font-size: 2em;
+    cursor: pointer;
+}
+.rating > input:checked ~ label {
+    color: gold;
+}
+.rating > input {
+    display: none;
+}
+.rating > label:hover,
+.rating > label:hover ~ label {
+    color: gold;
+}
+.star-rating i {
+    font-size: 20px; 
+    margin-right: 2px;
+}
+
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<section class="review_section layout_padding">
+    <div class="container">
+
+       <!-- Review Form Section -->
+       {% if session.get('user_id') %}
+       <div class="row">
+           <div class="col-md-12">
+               <h3 style="color: white;">Submit a Review</h3>
+               <form action="{{ url_for('addreview', recipe_id=request.args.get('recipe_id')) }}" method="POST">
+                <div class="form-group">
+                    <label for="review" style="color: white;">Your Rating</label>
+                    <div class="rating">
+                        <input type="radio" id="star5" name="rating" value="5" />
+                        <label for="star5" title="5 stars">☆</label>
+                        <input type="radio" id="star4" name="rating" value="4" />
+                        <label for="star4" title="4 stars">☆</label>
+                        <input type="radio" id="star3" name="rating" value="3" />
+                        <label for="star3" title="3 stars">☆</label>
+                        <input type="radio" id="star2" name="rating" value="2" />
+                        <label for="star2" title="2 stars">☆</label>
+                        <input type="radio" id="star1" name="rating" value="1" />
+                        <label for="star1" title="1 star">☆</label>
+                    </div>
+                </div>
+                   <div class="form-group">
+                       
+                       <label for="review" style="color: white;">Your Review</label>
+                       <textarea class="form-control" id="review" name="review" rows="4" placeholder="Write your review here..." required></textarea>
+                   </div>
+                   <button type="submit" class="btn btn-primary">Submit Review</button>
+               </form>
+           </div>
+       </div>
+       {% else %}
+       <div class="row" style="text-align: center;">
+           <div class="col-md-12">
+               <a class="nav-link" style="color:blue;" href="/register">Register</a>
+               <h6 style="color:white;">OR</h6>
+               <a class="nav-link" style="color:blue;" href="/login">Login</a>
+               <h6 style="color:white;">To add your review</h6>
+           </div>
+       </div>
+       {% endif %}
+       <br>
+
+        <!-- Reviews Section -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 style="color: white;">Reviews</h3>
+                <div class="reviews-list">
+                    {% if reviews %}
+                        {% for review in reviews %}
+                            <div class="review-item" style="background-color: #2d2d2d; border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                                <div style="display: flex; align-items: center;">
+                                    <!-- User Profile Icon -->
+                                    <i class="fas fa-user-circle" style="font-size: 40px; color: #ffc107; margin-right: 10px;"></i>
+                                    <strong style="color: #ffc107; font-size: 18px;">{{ review.user_name }} </strong>
+                                </div>
+                                  <!-- Display Rating as Stars -->
+                                  <div class="rating" style="margin-left: 15px; margin-top: 15px; direction: ltr;">
+                                    {% for i in range(1, 6) %}
+                                        {% if i <= review.rating %}
+                                            <i class="fas fa-star" style="color: gold;"></i>
+                                        {% else %}
+                                            <i class="fas fa-star" style="color: #ccc;"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p style="word-wrap: break-word; background-color: #f5f5f5; color: black; border-radius: 10px; padding: 15px; margin-top: 10px;">
+                                    {{ review.review }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <h6 style="color: white;">No reviews yet. Be the first to review!</h6>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

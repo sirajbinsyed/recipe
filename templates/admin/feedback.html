@@ -1,0 +1,38 @@
+{% extends "./admin/base.html" %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="content-body">
+    <div class="container-fluid">
+        <div class="container my-5">
+            <h2 class="mb-4 text-center"> Feedbacks</h2>
+
+            {% for fb in feedback %}
+            <div class="feedback-card card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div style="margin:15px" class="d-flex align-items-start">
+                        <i style="margin:15px" class="fas fa-user-circle fa-3x me-3 text-primary"></i> <!-- Font Awesome user icon -->
+                        <div class="flex-grow-1">
+                            <div class="feedback-header d-flex justify-content-between">
+                                <strong class="text-primary">{{ fb.name }}</strong>
+                                <span class="text-muted">{{ fb.email }}</span> <!-- Email displayed separately -->
+                            </div>
+                            <div class="feedback-body my-2">
+                                {{ fb.feedback }}
+                            </div>
+                            <div class="feedback-timestamp text-end text-muted">
+                                Submitted on: {{ fb.created_on }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center">No feedback found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

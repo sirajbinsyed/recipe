@@ -1,0 +1,74 @@
+{%extends "./guest/base.html" %}
+{% block content %}
+
+  <!-- book section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2 style="color: #fff;">
+          Login
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <div class="form_container">
+            <form action="/login" method="post">
+              {% if not_found %}
+              <p style="color: red;"> Invalid User Name or Password</p>
+              {% endif %}
+              <div>
+                <input type="text" class="form-control" placeholder="Username" name="username" />
+              </div>
+              <div style="position: relative; width: 100%;">
+                <input type="password" id="id_password" autocomplete="current-password" class="form-control" 
+                       placeholder="Password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z]).{8,}$" 
+                       title="Password must be at least 8 characters long and include both uppercase and lowercase letters." 
+                       required style="width: 100%; padding-right: 40px;">
+                       
+                       <img src="https://media.geeksforgeeks.org/wp-content/uploads/20210917145551/eye.png"
+                       width="20" height="20"
+                       style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"
+                       id="togglePassword">
+            </div>
+            
+              
+              <div class="btn_box">
+                <button type="submit">
+                  Login
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+  <!-- end book section -->
+  <script>
+    const togglePassword =
+          document.querySelector('#togglePassword');
+
+    const password = 
+          document.querySelector('#id_password');
+
+    togglePassword.
+    addEventListener('click', function (e) {
+
+        // Toggle the type attribute 
+        const type = password.getAttribute(
+            'type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+
+        // Toggle the eye slash icon 
+        if (togglePassword.src.match(
+"https://media.geeksforgeeks.org/wp-content/uploads/20210917150049/eyeslash.png")) {
+            togglePassword.src =
+"https://media.geeksforgeeks.org/wp-content/uploads/20210917145551/eye.png";
+        } else {
+            togglePassword.src =
+"https://media.geeksforgeeks.org/wp-content/uploads/20210917150049/eyeslash.png";
+        }
+    }); 
+</script>
+{% endblock %}

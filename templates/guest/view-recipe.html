@@ -1,0 +1,417 @@
+{% extends "./guest/base.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+ <style>
+            .truncate {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                -webkit-line-clamp: 2; /* Limit to 2 lines */
+                line-clamp: 2;
+                font-size: small;
+            }
+            .full-text {
+                display: none;
+            }
+            .hashtag
+            {
+                cursor: pointer;
+                color: red;
+                margin-left: 10px;
+                margin-top:10px;
+                border: 1px solid white;
+                border-radius: 15px;
+                padding: 5px 10px;
+            }
+
+            /* Container for search history */
+.history-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Space between history items */
+    padding: 10px;
+    background-color: #333;
+    border-radius: 10px;
+}
+
+/* Styling for individual search history items */
+.history-container .history-item {
+    background-color: #091b2e;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    text-transform: capitalize;
+    transition: background-color 0.3s;
+}
+
+/* Hover effect for history items */
+.history-container .history-item:hover {
+    background-color: #0056b3;
+}
+
+.search-history-heading {
+    color: aliceblue;
+    font-size: .9rem; /* Increase font size */
+    font-weight: bold; /* Make it bold */
+    text-align: left; /* Align to the left */
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007bff; /* Add a colored bottom border */
+    letter-spacing: 1px; /* Add slight spacing between letters */
+    margin-bottom: 20px;
+}
+
+.history-item {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.history-item:hover {
+    background-color: #0056b3;
+}
+
+.toggle-history-btn {
+    display: block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+        </style>
+<!-- Add the search bar at the top of the page -->
+   <!-- <div class="col-md-8">
+            <div style="color:white;" id="hashtagContainer" class="d-flex flex-wrap"></div>
+            <button id="seeMoreBtn" class="btn btn-link" onclick="showMoreHashtags()">See More</button>
+            <button id="seeLessBtn" class="btn btn-link" style="display: none;" onclick="showLessHashtags()">Show Less</button>
+        </div> -->
+   
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search recipes" onkeyup="filterRecipes()" list="searchSuggestions">
+                    <datalist id="searchSuggestions"></datalist>
+                </div>
+                <div class="col-md-2">
+                    <button id="searchBtn" class="btn btn-primary" onclick="searchRecipes()">Search</button>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <p class="search-history-heading">Search History:</p>
+                    <div id="searchHistoryContainer" class="history-container"></div>
+                </div>
+            </div>
+        </div>
+        
+       
+
+<!-- food section -->
+<section class="food_section layout_padding">
+    <div class="container">
+        <div class="heading_container heading_center">
+            <h2 style="color: white;">
+                Our Recipes
+            </h2>
+        </div>
+
+       
+
+        <div class="filters-content">
+            <!-- Add the ID here to the container of all recipe cards -->
+            <div class="row grid" id="recipeContainer">
+                {% for recipe in recipes %}
+                <!-- Each recipe card should have the class 'recipe-box' and data attributes -->
+                <div class="col-sm-6 col-lg-4 all pizza recipe-box" data-title="{{ recipe.recipe_title }}" data-description="{{ recipe.recipe_description }}" data-category="{{ recipe.category_name }}">
+                    <div class="box">
+                        <div>
+                            <div class="img-box">
+                                <img src="static/recipe/{{ recipe.recipe_image }}" alt="">
+                            </div>
+                            <div class="detail-box">
+                                <h6 style="color: rgb(221, 224, 207);">user: <strong style="color: rgb(153, 141, 207);">{{ recipe.login_username }}</strong></h6>
+                                <h5>{{ recipe.recipe_title }}</h5>
+                                <p class="truncate">{{ recipe.recipe_description }}</p>
+
+                                <div class="options">
+                                    <h6>{{ recipe.category_name }}</h6>
+                                    {% if session['user_id'] %}
+                                    <a href="{{ url_for('addfav', recipe_id=recipe.recipe_id) }}" 
+                                    style="color: {% if recipe.status == 'true' %}#BDAA00{% else %}white{% endif %}; background-color: rgb(117, 192, 32);">
+                                       
+                                        <i class="fas fa-star"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <br>
+                                <a href="view-single-recipe/{{ recipe.recipe_id }}">view more</a>
+                                
+                                <div style="margin: 10px;">
+                                    <label>Rating:</label>
+                                    {% set full_stars = recipe.average_rating | int %}
+                                    {% set half_star = 1 if (recipe.average_rating - full_stars) >= 0.5 else 0 %}
+                                    {% set empty_stars = 5 - full_stars - half_star %}
+        
+                                    <!-- Full stars -->
+                                    {% for i in range(full_stars) %}
+                                        <i class="fas fa-star" style="color: gold;"></i>
+                                    {% endfor %}
+        
+                                    <!-- Half star -->
+                                    {% if half_star %}
+                                        <i class="fas fa-star-half-alt" style="color: gold;"></i>
+                                    {% endif %}
+        
+                                    <!-- Empty stars -->
+                                    {% for i in range(empty_stars) %}
+                                        <i class="far fa-star" style="color: gold;"></i>
+                                    {% endfor %}
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="btn-box">
+            <a href="">
+                View More
+            </a>
+        </div>
+    </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+ 
+
+
+
+ // Function to save search history to localStorage and display it
+function saveSearchHistory(term) {
+    let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    console.log("this is history", searchHistory);
+    if (!searchHistory.includes(term)) {
+        searchHistory.push(term);
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+    }
+    displaySearchHistory();
+}
+
+let isShowingFullHistory = false; // To manage the toggle state
+
+function displaySearchHistory() {
+    let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    const historyContainer = document.getElementById('searchHistoryContainer');
+    historyContainer.innerHTML = '';
+    searchHistory.reverse();
+
+    // Check if the search history is empty
+    if (searchHistory.length === 0) {
+        // Display recent searches if history is empty
+        displayRecentSearches();
+        return; // Exit the function
+    }
+
+    // If the user is not viewing full history, slice to show only the first 10 items
+    const historyToShow = isShowingFullHistory ? searchHistory : searchHistory.slice(0, 9);
+
+    // Reverse the search history array to display in descending order
+    historyToShow.forEach(term => {
+        const span = document.createElement('span');
+        span.textContent = term;
+        span.className = 'history-item';  // Apply class for styling
+        span.onclick = () => {
+            // Allow clicking on history item to populate search input and trigger search
+            document.getElementById('searchInput').value = term;
+            searchRecipes();  // Trigger search with selected history term
+        };
+        historyContainer.appendChild(span);
+    });
+
+    // Add the "View More" or "Show Less" button
+    if (searchHistory.length > 9) {
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'btn btn-secondary toggle-history-btn';
+        toggleButton.textContent = isShowingFullHistory ? 'Show Less' : 'View More';
+        toggleButton.onclick = toggleHistoryView;
+        historyContainer.appendChild(toggleButton);
+    }
+}
+
+// Function to display recent searches
+function displayRecentSearches() {
+    const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+    const historyContainer = document.getElementById('searchHistoryContainer');
+    historyContainer.innerHTML = '';
+
+    if (recentSearches.length === 0) {
+        historyContainer.textContent = 'No recent searches available.';
+        return;
+    }
+
+    recentSearches.forEach(term => {
+        const span = document.createElement('span');
+        span.textContent = term;
+        span.className = 'history-item';  // Apply class for styling
+        span.onclick = () => {
+            // Allow clicking on recent search item to populate search input and trigger search
+            document.getElementById('searchInput').value = term;
+            searchRecipes();  // Trigger search with selected recent term
+        };
+        historyContainer.appendChild(span);
+    });
+}
+
+// Function to toggle between full and limited history view
+function toggleHistoryView() {
+    isShowingFullHistory = !isShowingFullHistory;
+    displaySearchHistory(); // Re-render the history
+}
+
+// Call this function on page load to display saved history
+window.onload = function() {
+    displaySearchHistory();
+};
+// Function to handle recipe search
+function searchRecipes() {
+    const searchInput = document.getElementById('searchInput').value.trim();
+    if (searchInput) {
+        saveSearchHistory(searchInput);
+        $.ajax({
+            url: '{{ url_for('searchrecipe') }}', 
+            method: 'GET',
+            data: { search: searchInput }, 
+            success: function(response) {
+                // Clear the current recipes
+                $('#recipeContainer').empty();
+                const baseUrl = "{{ url_for('addfav', recipe_id='') }}";
+                response.recipes.forEach(recipe => {
+                    const isFavorite = recipe.status === 'true';
+                    const userId = {{ session['user_id'] if session['user_id'] else 'null' }};
+                    
+                    const favoriteButton = userId ? `
+                        <a href="${baseUrl}${recipe.recipe_id}" 
+                           style="color: ${isFavorite ? '#BDAA00' : 'white'}; background-color: rgb(117, 192, 32);">
+                            <i class="fas fa-star"></i>
+                        </a>` : '';
+
+                    const recipeElement = `
+                        <div class="col-sm-6 col-lg-4 all pizza recipe-box" 
+                             data-title="${recipe.recipe_title}" 
+                             data-description="${recipe.recipe_description}" 
+                             data-category="${recipe.category_name}">
+                            <div class="box">
+                                <div>
+                                    <div class="img-box">
+                                        <img src="static/recipe/${recipe.recipe_image}" alt="">
+                                    </div>
+                                    <div class="detail-box">
+                                        <h6 style="color: rgb(221, 224, 207);">user: <strong style="color: rgb(153, 141, 207);">${recipe.login_username}</strong></h6>
+                                        <h5>${recipe.recipe_title}</h5>
+                                        <p class="truncate">${recipe.recipe_description}</p>
+                                        <div class="options">
+                                            <h6>${recipe.category_name}</h6>
+                                            ${favoriteButton}
+                                        </div>
+                                        <br>
+                                        <a href="/view-single-recipe/${recipe.recipe_id}">view more</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $('#recipeContainer').append(recipeElement);
+                });
+
+                if (response.recipes.length === 0) {
+                    $('#recipeContainer').append('<p style="color: white;">No recipes found.</p>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Search failed:', error);
+            }
+        });
+    }
+}
+
+//  Hashtags passed from the backend
+const hashtags = {{ hash_tags|tojson }};
+console.log("this is hash tags:", hashtags);
+
+function filterRecipes() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const datalist = document.getElementById('searchSuggestions');
+
+    // Clear current suggestions
+    datalist.innerHTML = '';
+
+    // Filter hashtags based on the input
+    const filteredHashtags = hashtags.filter(tag => tag.toLowerCase().includes(searchInput));
+
+    // Create a Set to avoid duplicates
+    const uniqueHashtags = new Set(filteredHashtags);
+
+    // Populate the datalist with unique hashtags without the '#'
+    uniqueHashtags.forEach(tag => {
+        const option = document.createElement('option');
+        // Remove '#' from the tag for display in suggestions
+        option.value = tag.replace('#', ''); 
+        datalist.appendChild(option);
+    });
+}
+
+function displayHashtags() {
+    const hashtagContainer = document.getElementById('hashtagContainer');
+    let html = '';
+    const initialHashtags = hashtags.slice(0, 10); // Show first 10
+    
+    initialHashtags.forEach(tag => {
+        html += `<span class="hashtag" onclick="addHashtagToSearch('${tag}')">${tag}</span>`;
+    });
+    
+    hashtagContainer.innerHTML = html;
+
+    if (hashtags.length <= 10) {
+        document.getElementById('seeMoreBtn').style.display = 'none';
+    }
+}
+
+function showMoreHashtags() {
+    const hashtagContainer = document.getElementById('hashtagContainer');
+    let html = '';
+    
+    hashtags.forEach(tag => {
+        html += `<span class="hashtag" onclick="addHashtagToSearch('${tag}')">${tag}</span>`;
+    });
+    
+    hashtagContainer.innerHTML = html;
+    document.getElementById('seeMoreBtn').style.display = 'none';
+    document.getElementById('seeLessBtn').style.display = 'block';
+}
+
+function showLessHashtags() {
+    location.reload();
+}
+
+function addHashtagToSearch(tag) {
+    const searchInput = document.getElementById('searchInput');
+    const cleanTag = tag.replace('#', '');
+    searchInput.value = cleanTag;
+    searchRecipes();
+}
+
+// Combine both functions into one or use addEventListener as shown above
+window.onload = function() {
+    displaySearchHistory();
+    displayHashtags();
+};
+</script>
+{% endblock %}
+

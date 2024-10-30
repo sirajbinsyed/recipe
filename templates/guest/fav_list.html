@@ -1,0 +1,85 @@
+{% extends "./guest/base.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+            .truncate {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                -webkit-line-clamp: 2; /* Limit to 2 lines */
+                line-clamp: 2;
+                font-size: small;
+            }
+            .full-text {
+                display: none;
+            }
+        </style>
+<!-- Add the search bar at the top of the page -->
+
+
+
+<!-- food section -->
+<section class="food_section layout_padding">
+    <div class="container">
+        <div class="heading_container heading_center">
+            <h2 style="color: white;">
+                Our Recipes
+            </h2>
+        </div>
+
+       
+
+        <div class="filters-content">
+            <!-- Add the ID here to the container of all recipe cards -->
+            <div class="row grid" id="recipeContainer">
+                {% if recipes %}
+                {% for recipe in recipes %}
+                <!-- Each recipe card should have the class 'recipe-box' and data attributes -->
+                <div class="col-sm-6 col-lg-4 all pizza recipe-box" data-title="{{ recipe.recipe_title }}" data-description="{{ recipe.recipe_description }}" data-category="{{ recipe.category_name }}">
+                    <div class="box">
+                        <div>
+                            <div class="img-box">
+                                <img src="static/recipe/{{ recipe.recipe_image }}" alt="">
+                            </div>
+                            <div class="detail-box">
+                                <h6 style="color: rgb(221, 224, 207);">user: <strong style="color: rgb(153, 141, 207);">{{ recipe.login_username }}</strong></h6>
+                                <h5>{{ recipe.recipe_title }}</h5>
+                                <p class="truncate">{{ recipe.recipe_description }}</p>
+
+                                <div class="options">
+                                    <h6>{{ recipe.category_name }}</h6>
+                                    {% if session['user_id'] %}
+                                    <a href="{{ url_for('addfav', recipe_id=recipe.recipe_id) }}" 
+                                    style="color: {% if recipe.status == 'true' %}#BDAA00{% else %}white{% endif %}; background-color: rgb(117, 192, 32);">
+                                       
+                                        <i class="fas fa-star"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <br>
+                                <a href="view-single-recipe/{{ recipe.recipe_id }}">view more</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+            </div>
+            {% else %}
+               
+                <h4 style="color: rgb(113, 214, 18); text-align: center; padding: 100px; align-self: center;">No Favourite Recipes ---------------</h4>
+          
+                {% endif %}
+        </div>
+        
+        <div class="btn-box">
+            <a href="">
+                View More
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
